@@ -18,10 +18,29 @@ export default class MortgageLender {
   }
 
   reviewApplication(pendingApp: LoanApplication): void {
-
+    if(
+      pendingApp.dti < 36 &&
+      pendingApp.creditScore > 620 &&
+      pendingApp.savings >= 0.25 * pendingApp.loanAmount
+    ) {
+      pendingApp.isQualified = true;
+    } else {
+      pendingApp.isQualified = false;
+    }
   }
 
-  sendOffer(loanApp: LoanApplication):void {}
+  sendOffer(loanApp: LoanApplication):void {
+    loanApp.loanStatus = LoanStatus.Pending;
+    this.pendingFunds += loanApp.loanAmount;
+    this.availableFunds -= loanApp.loanAmount;
+  }
 
-  releaseOffer(loanApp: LoanApplication): void {}
+  releaseOffer(loanApp: LoanApplication): void {
+    if(loanApp.loanStatus === LoanStatus.Accepted) {
+      this.pendingFunds -= loanApp.loanAmount;
+    } else if(loanApp.loanStatus === LoanStatus.Rejected) {
+      this.pendingFunds -= loanApp.loanAmount;
+      this.availableFunds += loanApp.loanAmount;
+    }
+  }
 }
